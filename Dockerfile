@@ -24,7 +24,7 @@
 
 # Use Debian as base for the build
 ARG DEBIAN_VERSION=stable
-FROM debian:${DEBIAN_VERSION} AS builder
+FROM debian:"${DEBIAN_VERSION}" AS builder
 
 # Base directory for installed build artifacts.
 # Due to limitations of the Docker image build process, this value is
@@ -97,7 +97,7 @@ ARG RUNTIME_DEPENDENCIES="            \
         xfonts-terminus"
 
 # Copy build artifacts into this stage
-COPY --from=builder ${PREFIX_DIR} ${PREFIX_DIR}
+COPY --from=builder "${PREFIX_DIR}" "${PREFIX_DIR}"
 
 # Bring runtime environment up to date and install runtime dependencies
 RUN apt-get update                                          && \
