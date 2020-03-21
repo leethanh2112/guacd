@@ -24,7 +24,7 @@
 
 # Use Debian as base for the build
 ARG DEBIAN_VERSION=stable
-FROM debian:${DEBIAN_VERSION} AS builder
+FROM debian:stable AS builder
 
 # Base directory for installed build artifacts.
 # Due to limitations of the Docker image build process, this value is
