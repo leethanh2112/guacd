@@ -62,7 +62,7 @@ spec:
         - containerPort: 4822
           name: guacd-rcd
         volumeMounts:
-        - name: guacamole-rcd
+        - name: guacd-rcd
           mountPath: /usr/src/video
       volumes:
       - name: guacd-rcd
