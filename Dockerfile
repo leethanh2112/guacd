@@ -109,6 +109,8 @@ RUN apt-get update                                          && \
 RUN ${PREFIX_DIR}/bin/link-freerdp-plugins.sh \
         ${PREFIX_DIR}/lib/freerdp2/libguac*.so
 
+RUN mkdir /usr/src/video
+
 # Expose the default listener port
 EXPOSE 4822
 
