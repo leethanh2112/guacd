@@ -73,7 +73,7 @@ RUN ${PREFIX_DIR}/bin/list-dependencies.sh    \
         > ${PREFIX_DIR}/DEPENDENCIES
 
 # Use same Debian as the base for the runtime image
-FROM debian:${DEBIAN_VERSION}-slim
+FROM debian:stable-slim
 
 # Base directory for installed build artifacts.
 # Due to limitations of the Docker image build process, this value is
