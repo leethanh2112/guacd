@@ -84,7 +84,7 @@ ARG PREFIX_DIR=/usr/local/guacamole
 
 # Runtime environment
 ENV LC_ALL=C.UTF-8
-ENV LD_LIBRARY_PATH=${PREFIX_DIR}/lib
+ENV LD_LIBRARY_PATH=/usr/local/guacamole/lib
 ENV GUACD_LOG_LEVEL=info
 
 ARG RUNTIME_DEPENDENCIES="            \
@@ -95,17 +95,17 @@ ARG RUNTIME_DEPENDENCIES="            \
         xfonts-terminus"
 
 # Copy build artifacts into this stage
-COPY --from=builder ${PREFIX_DIR} ${PREFIX_DIR}
+COPY --from=builder /usr/local/guacamole /usr/local/guacamole
 
 # Bring runtime environment up to date and install runtime dependencies
 RUN apt-get update                                          && \
     apt-get install -y $RUNTIME_DEPENDENCIES                && \
-    apt-get install -y $(cat "${PREFIX_DIR}"/DEPENDENCIES)  && \
+    apt-get install -y $(cat "/usr/local/guacamole"/DEPENDENCIES)  && \
     rm -rf /var/lib/apt/lists/*
 
 # Link FreeRDP plugins into proper path
-RUN ${PREFIX_DIR}/bin/link-freerdp-plugins.sh \
-        ${PREFIX_DIR}/lib/freerdp2/libguac*.so
+RUN /usr/local/guacamole/bin/link-freerdp-plugins.sh \
+        /usr/local/guacamole/lib/freerdp2/libguac*.so
 
 # Expose the default listener port
 EXPOSE 4822
