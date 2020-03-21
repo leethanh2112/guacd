@@ -23,7 +23,9 @@
 
 
 # Use Debian as base for the build
-FROM debian:stable AS builder
+ARG DEBIAN_VERSION=stable
+FROM debian:${DEBIAN_VERSION} AS builder
+
 # Base directory for installed build artifacts.
 # Due to limitations of the Docker image build process, this value is
 # duplicated in an ARG in the second stage of the build.
@@ -73,7 +75,7 @@ RUN ${PREFIX_DIR}/bin/list-dependencies.sh    \
         > ${PREFIX_DIR}/DEPENDENCIES
 
 # Use same Debian as the base for the runtime image
-FROM debian:stable-slim
+FROM debian:${DEBIAN_VERSION}-slim
 
 # Base directory for installed build artifacts.
 # Due to limitations of the Docker image build process, this value is
@@ -84,7 +86,7 @@ ARG PREFIX_DIR=/usr/local/guacamole
 
 # Runtime environment
 ENV LC_ALL=C.UTF-8
-ENV LD_LIBRARY_PATH=/usr/local/guacamole/lib
+ENV LD_LIBRARY_PATH=${PREFIX_DIR}/lib
 ENV GUACD_LOG_LEVEL=info
 
 ARG RUNTIME_DEPENDENCIES="            \
@@ -95,17 +97,17 @@ ARG RUNTIME_DEPENDENCIES="            \
         xfonts-terminus"
 
 # Copy build artifacts into this stage
-COPY --from=builder /usr/local/guacamole /usr/local/guacamole
+COPY --from=builder ${PREFIX_DIR} ${PREFIX_DIR}
 
 # Bring runtime environment up to date and install runtime dependencies
 RUN apt-get update                                          && \
     apt-get install -y $RUNTIME_DEPENDENCIES                && \
-    apt-get install -y $(cat "/usr/local/guacamole"/DEPENDENCIES)  && \
+    apt-get install -y $(cat "${PREFIX_DIR}"/DEPENDENCIES)  && \
     rm -rf /var/lib/apt/lists/*
 
 # Link FreeRDP plugins into proper path
-RUN /usr/local/guacamole/bin/link-freerdp-plugins.sh \
-        /usr/local/guacamole/lib/freerdp2/libguac*.so
+RUN ${PREFIX_DIR}/bin/link-freerdp-plugins.sh \
+        ${PREFIX_DIR}/lib/freerdp2/libguac*.so
 
 # Expose the default listener port
 EXPOSE 4822
@@ -116,4 +118,3 @@ EXPOSE 4822
 # PREFIX_DIR build argument.
 #
 CMD /usr/local/guacamole/sbin/guacd -b 0.0.0.0 -L $GUACD_LOG_LEVEL -f
-
